@@ -29,6 +29,21 @@ survives app rebuilds. No locale service, no dictionaries, no global
 `unicode-bidi: plaintext` was dropped: it does not resolve computed
 `direction` in this Chromium; `dir="auto"` does.)
 
+## Install for other developers
+
+**Option A — from GitHub (works today):**
+
+```powershell
+pnpm add https://github.com/mehran282/dsh-chat-rtl/releases/download/v0.1.3/dsh-chat-rtl-0.1.3.tgz
+```
+
+or in the Harness: Settings → Built-in plugins → install external bundle →
+pick the `.tgz`, enable `chat-rtl`, restart. Any git address or tarball the
+plugin manager accepts works — see `INSTALL.md`.
+
+**Option B — from npm (once published):** `pnpm add dsh-chat-rtl`,
+or by registry name straight from the plugin manager.
+
 ## Status (v0.1.3)
 
 - `node --check` clean; loader simulation green
