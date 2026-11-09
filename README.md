@@ -5,7 +5,8 @@ By **Mehran Ghalambor** ([mehran.ghalambor@gmail.com](mailto:mehran.ghalambor@gm
 Real, installable client plugin + profile bundle for DeepSeek Harness.
 The app stays in its own language (English); only conversation content
 reflows: paragraphs that start with Persian render right-to-left,
-English paragraphs stay left-to-right.
+English paragraphs stay left-to-right — and when your latest question
+reads Persian, the whole flow follows it right-to-left.
 
 ## How
 
@@ -22,6 +23,11 @@ editor framework drops the attribute):
 - `pre`/`code` are pinned to `direction: ltr` so code never flips.
 - The composer (`[data-composer-input]`) gets `dir="auto"` so typing in
   Persian aligns right while typing.
+- Conversation mode: the last `[data-chat-flow-kind="user"]` turn decides.
+  If it starts with Persian, the flow gets `data-dsh-chat-rtl="fa"` and
+  every message block — English headings and trajectory step titles
+  included — renders `rtl` (code still LTR). Otherwise each block keeps
+  its own `dir="auto"`.
 
 Only stable `data-*` hooks are used — no hashed class names — so it
 survives app rebuilds. No locale service, no dictionaries, no global

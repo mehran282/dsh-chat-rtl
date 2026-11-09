@@ -1,7 +1,7 @@
 {
   "name": "dsh-chat-rtl",
   "description": "Auto right-to-left for Persian conversation content in DeepSeek Harness (app stays in its own language)",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "publishConfig": {
     "access": "public"
   },

@@ -12,11 +12,11 @@ const CSS = [
   `${FLOW_SEL} ${BLOCK_SEL} {`,
   "  text-align: start;",
   "}",
-  "/* Trajectory chrome (process-activity step titles) follows the chat direction. */",
-  '[data-slot="conversation.chat.flow"] button[data-process-activity],',
-  '[data-slot="conversation.chat.node"] button[data-process-activity] {',
+  "/* Conversation-level mode: when the last user turn reads Persian, */",
+  "/* whole message blocks follow it (code stays LTR). */",
+  `${FLOW_SEL}[data-dsh-chat-rtl="fa"] ${BLOCK_SEL},`,
+  `${FLOW_SEL}[data-dsh-chat-rtl="fa"] button[data-process-activity] {`,
   "  direction: rtl;",
-  "  text-align: start;",
   "}",
   "/* Block code and inline code stay LTR inside any paragraph. */",
   '[data-slot="conversation.chat.flow"] pre,',
@@ -29,9 +29,34 @@ const CSS = [
   "}"
 ].join("\n");
 
-// Set dir="auto" on every message block + the composer inside root.
-// dir=auto resolves each element's direction from its own first strong
-// character (verified live: Persian -> rtl, English -> ltr).
+// Conversation-level mode: when the last user turn reads Persian, the whole
+// flow is marked and every message block follows it (CSS above wins over the
+// per-block dir=auto fallback, which still covers undetermined flows).
+const USER_SEL = '[data-chat-flow-kind="user"]';
+const FA_RANGE = "\\u0600-\\u06FF\\u0750-\\u077F\\u08A0-\\u08FF\\uFB50-\\uFDFF\\uFE70-\\uFEFE";
+const FA_FIRST = new RegExp("[A-Za-z" + FA_RANGE + "]");
+const IS_LATIN = /^[A-Za-z]$/;
+
+function flowMode(flowEl) {
+  const users = flowEl.querySelectorAll(USER_SEL);
+  if (!users.length) return null;
+  const text = (users[users.length - 1].textContent || "").trim();
+  const first = text.match(FA_FIRST);
+  if (!first) return null;
+  return IS_LATIN.test(first[0]) ? "en" : "fa";
+}
+
+function applyMode(flowEl) {
+  if (flowMode(flowEl) === "fa") flowEl.setAttribute("data-dsh-chat-rtl", "fa");
+  else flowEl.removeAttribute("data-dsh-chat-rtl");
+}
+
+function autotizeFlows(scope) {
+  const flows = scope === document
+    ? Array.from(document.querySelectorAll(FLOW_SEL))
+    : (scope.matches && scope.matches(FLOW_SEL) ? [scope] : Array.from(scope.querySelectorAll(FLOW_SEL)));
+  for (const flow of flows) applyMode(flow);
+}
 function autotize(root) {
   const scope = root && root.querySelectorAll ? root : document;
   const found = [];
@@ -59,6 +84,7 @@ export function apply(ctx) {
     style.textContent = CSS;
     document.head.appendChild(style);
     autotize(document);
+    autotizeFlows(document);
     const observer = new MutationObserver((mutations) => {
       for (const m of mutations) {
         if (m.type === "attributes") {
@@ -70,9 +96,17 @@ export function apply(ctx) {
           }
           continue;
         }
+        const touchUser = (n) => n.matches && (n.matches(USER_SEL) || n.querySelector(USER_SEL));
         for (const node of m.addedNodes) {
           if (node.nodeType !== 1) continue;
           autotize(node);
+          const flow = node.closest ? node.closest(FLOW_SEL) : null;
+          if (flow && touchUser(node)) applyMode(flow);
+          else if (flow && node.matches && node.matches(FLOW_SEL)) applyMode(flow);
+        }
+        if (m.removedNodes.length && m.target.closest) {
+          const flow = m.target.closest(FLOW_SEL);
+          if (flow) applyMode(flow);
         }
       }
     });
