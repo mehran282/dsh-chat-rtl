@@ -1,0 +1,49 @@
+{
+  "name": "dsh-chat-rtl",
+  "description": "Auto right-to-left for Persian conversation content in DeepSeek Harness (app stays in its own language)",
+  "version": "0.1.3",
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": {
+    "name": "Mehran Ghalambor",
+    "email": "mehran.ghalambor@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mehran282/dsh-chat-rtl.git"
+  },
+  "homepage": "https://github.com/mehran282/dsh-chat-rtl#readme",
+  "bugs": {
+    "url": "https://github.com/mehran282/dsh-chat-rtl/issues"
+  },
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./src/*": "./src/*",
+    "./package.json": "./package.json",
+    "./cordis.patch.yml": "./cordis.patch.yml"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [],
+      "platform": "web"
+    }
+  },
+  "license": "MIT",
+  "files": [
+    "lib/index.js",
+    "lib/client.js",
+    "cordis.patch.yml",
+    "LICENSE",
+    "INSTALL.md"
+  ],
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "~4.1.0"
+  }
+}

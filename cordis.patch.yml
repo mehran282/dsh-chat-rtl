@@ -1,0 +1,6 @@
+# dsh-chat-rtl — profile bundle layer.
+# Same row semantics as the shipped bundles: one insert, addressed by id.
+
+- insert:
+    - id: chat-rtl
+      name: 'dsh-chat-rtl'
